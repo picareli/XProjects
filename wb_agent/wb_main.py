@@ -17,49 +17,55 @@ current_payload = 70
 # When true, signals that the filling of the payload has been interrupted by the user.
 interrupt_payload_flag = False
 
+is_interrupted = False
+
 _total_filled = 0
 
-def fill_kg (desired_kg, fill_rate, current_kg, is_interrupted) :
+def fill_kg (desired_kg, fill_rate) :
 
     global _total_filled
+    global current_fuel
+    global is_interrupted
+
+    result_kg = current_fuel + desired_kg
 
     _total_filled = 0
 
     while _total_filled < desired_kg :
+
+        print(is_interrupted)
         
         if is_interrupted == True :
-        
+
             print("interrupted filling")
 
-            return current_kg
-        
+            return
+
         time.sleep(1)
 
         _total_filled += fill_rate
+        current_fuel += fill_rate
 
-        if _total_filled > desired_kg :
-            _total_filled = desired_kg
+        print(_total_filled, " ", current_fuel)
 
-        current_kg += fill_rate
-        print(_total_filled, " ", current_kg)
-
-    return current_kg
+    if current_fuel > result_kg :
+        current_fuel = result_kg
 
 # Fills a desired ammount of fuel in kg to the aircraft.
 def fill_fuel_kg (desired_ammount) :
 
-    global current_fuel
+    global FUEL_RATE_KG
 
-    current_fuel = fill_kg(desired_ammount, FUEL_RATE_KG, current_fuel, interrupt_fuel_flag)
+    fill_kg(desired_ammount, FUEL_RATE_KG)
 
     print("Fuel filling complete\nAMMOUNT: ", current_fuel)
 
 # Fills a desired ammount of payload in kg to the aircraft.
 def fill_payload_kg (desired_ammount) :
 
-    global current_payload
+    global PAYLOAD_RATE_KG
 
-    current_payload = fill_kg(desired_ammount, PAYLOAD_RATE_KG, current_payload, interrupt_payload_flag)
+    fill_kg(desired_ammount, PAYLOAD_RATE_KG)
 
     print("Payload filling complete\nAMMOUNT: ", current_payload)
 
@@ -67,7 +73,7 @@ def fill_payload_kg (desired_ammount) :
 def interrupt_fuel_filling () :
 
     global interrupt_fuel_flag
-    
+
     interrupt_fuel_flag = True
 
     print("Interrupting fuel filling...")
@@ -81,5 +87,10 @@ def interrupt_payload_filling () :
 
     print("Interrupting payload filling...")
 
+def interrupt_filling () :
+
+    global is_interrupted
+
+    is_interrupted = True
 
 fill_fuel_kg(340)
